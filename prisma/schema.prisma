@@ -88,14 +88,14 @@ model Image {
   size      BigInt
   awsKey    String
 
-  keyword       keyword[]
+  keyword       Keyword[]
   ImageFolder   Folder    @relation(fields: [imageFolderId], references: [id])
   imageFolderId String
 
   @@index([imageFolderId])
 }
 
-model keyword {
+model Keyword {
   id      String @id @default(cuid())
   name    String
   imageId String

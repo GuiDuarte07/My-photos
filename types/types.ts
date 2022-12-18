@@ -19,6 +19,11 @@ export interface IImageApiNextApiRequest extends NextApiRequest {
     etag: string;
     versionId: undefined;
   };
+  body: {
+    title: string;
+    folderId: string;
+    keyword: { name: string }[];
+  };
 }
 
 export interface IFolderApiNextApiRequest extends NextApiRequest {

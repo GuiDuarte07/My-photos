@@ -20,7 +20,7 @@ const apiRoute = nextConnect({
 apiRoute.use(upload.single('file'));
 
 apiRoute.post(async (req: IImageApiNextApiRequest, res: NextApiResponse) => {
-  const { title, folderId } = req.body;
+  const { title, folderId, keyword } = req.body;
   const {
     file: { location: url, mimetype, size, key },
   } = req;
@@ -36,6 +36,11 @@ apiRoute.post(async (req: IImageApiNextApiRequest, res: NextApiResponse) => {
         ImageFolder: {
           connect: {
             id: folderId,
+          },
+        },
+        keyword: {
+          createMany: {
+            data: keyword,
           },
         },
       },
