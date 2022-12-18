@@ -11,13 +11,16 @@ const apiRoute = nextConnect({
 });
 
 apiRoute.post(async (req: IFolderApiNextApiRequest, res: NextApiResponse) => {
-  const { name } = req.body;
+  const { name, parentId } = req.body;
 
   let data: { id: string };
 
   try {
-    data = await prisma.imageFolder.create({
-      data: { name },
+    data = await prisma.folder.create({
+      data: {
+        name,
+        ...(parentId && { parent: { connect: { id: parentId } } }),
+      },
       select: { id: true },
     });
   } catch (e) {

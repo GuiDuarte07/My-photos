@@ -29,5 +29,6 @@ export interface IImageApiNextApiRequest extends NextApiRequest {
 export interface IFolderApiNextApiRequest extends NextApiRequest {
   body: {
     name: string;
+    parentId: string;
   };
 }
