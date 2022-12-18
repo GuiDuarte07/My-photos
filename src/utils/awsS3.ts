@@ -8,7 +8,7 @@ const s3 = new aws.S3({
   region: process.env.AWS_REGION,
 });
 
-const upload = multer({
+export const upload = multer({
   storage: multerS3({
     s3: s3,
     bucket: process.env.AWS_BUCKET ?? '',
@@ -20,6 +20,24 @@ const upload = multer({
       cb(null, `${Date.now().toString()}_${file.originalname}`);
     },
   }),
+  fileFilter: function (req, file, cb) {
+    console.log(file);
+    if (file.mimetype.startsWith('image')) {
+      cb(null, true);
+    } else {
+      cb(new Error('tipo inválido', { cause: { error: 'Apenas imagem' } }));
+    }
+  },
+  limits: { fileSize: 1000000 },
 });
 
-export default upload;
+export function deleteFromAWS(key: string) {
+  return s3.deleteObject(
+    { Key: key, Bucket: process.env.AWS_BUCKET ?? '' },
+    function (err, data) {
+      console.log(data);
+      if (err) return false;
+      else return true;
+    }
+  );
+}

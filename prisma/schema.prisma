@@ -63,16 +63,16 @@ model User {
   createdAt     DateTime  @default(now())
 }
 
-model ImageFolder {
+model Folder {
   id        String   @id @default(cuid())
   name      String   @unique
   secret    String?  @db.Char(6)
   createdAt DateTime @default(now())
 
-  parent    ImageFolder? @relation("folder_Children", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parent    Folder? @relation("folder_Children", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   parent_id String?
 
-  children ImageFolder[] @relation("folder_Children")
+  children Folder[] @relation("folder_Children")
   image    Image[]
 
   @@index([parent_id])
@@ -86,9 +86,10 @@ model Image {
   hidden    Boolean  @default(false)
   mimetype  String
   size      BigInt
+  awsKey    String
 
   keyword       keyword[]
-  ImageFolder   ImageFolder @relation(fields: [imageFolderId], references: [id])
+  ImageFolder   Folder    @relation(fields: [imageFolderId], references: [id])
   imageFolderId String
 
   @@index([imageFolderId])

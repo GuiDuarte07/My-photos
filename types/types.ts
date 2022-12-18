@@ -1,11 +1,12 @@
 import { NextApiRequest } from 'next';
+
 export interface IImageApiNextApiRequest extends NextApiRequest {
   file: {
     fieldname: string;
     originalname: string;
     encoding: string;
     mimetype: string;
-    size: 808419;
+    size: number;
     bucket: string;
     key: string;
     acl: string;
@@ -17,5 +18,11 @@ export interface IImageApiNextApiRequest extends NextApiRequest {
     location: string;
     etag: string;
     versionId: undefined;
+  };
+}
+
+export interface IFolderApiNextApiRequest extends NextApiRequest {
+  body: {
+    name: string;
   };
 }

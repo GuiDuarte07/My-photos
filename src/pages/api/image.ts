@@ -1,11 +1,8 @@
 import nextConnect from 'next-connect';
-import upload from '../../utils/upload';
+import { deleteFromAWS, upload } from '../../utils/awsS3';
 import prisma from '../../lib/prismadb';
 import { NextApiRequest, NextApiResponse } from 'next';
-import {
-  IImageApiNextApiRequest,
-  IImageApiNextApiResponse,
-} from '../../../types/types';
+import { IImageApiNextApiRequest } from '../../../types/types';
 
 export const config = {
   api: {
@@ -15,30 +12,38 @@ export const config = {
 
 const apiRoute = nextConnect({
   // Handle any other HTTP method
-  onNoMatch(req, res) {
-    res.status(405).json({ error: `Method '${req.method}' Not Allowed` });
+  onNoMatch(req: NextApiRequest, res: NextApiResponse) {
+    res.status(405).send(`Method '${req.method}' Not Allowed`);
   },
 });
 
 apiRoute.use(upload.single('file'));
 
 apiRoute.post(async (req: IImageApiNextApiRequest, res: NextApiResponse) => {
-  const { title }: { title: string } = req.body;
+  const { title, folderId } = req.body;
   const {
-    file: { location: url, mimetype, size },
-  }: { file: { location: string; mimetype: string; size: number } } = req;
+    file: { location: url, mimetype, size, key },
+  } = req;
 
-  await prisma.image.create({
-    data: {
-      title,
-      url,
-      mimetype,
-      size,
-      ImageFolder: {
-        connectOrCreate: { create: { name: 'test' }, where: { name: 'test' } },
+  try {
+    await prisma.image.create({
+      data: {
+        title,
+        url,
+        mimetype,
+        size,
+        awsKey: key,
+        ImageFolder: {
+          connect: {
+            id: folderId,
+          },
+        },
       },
-    },
-  });
+    });
+  } catch (e) {
+    deleteFromAWS(key);
+    return res.status(400).send('failed');
+  }
 
   res.status(200).send('sucess');
 });
