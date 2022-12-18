@@ -1,0 +1,41 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "plugins": ["@typescript-eslint", "prettier"],
+  "extends": ["next/core-web-vitals", "plugin:@typescript-eslint/recommended", "prettier"],
+  "rules": {
+    "prettier/prettier": 2, // Means error
+    "react/jsx-filename-extension": [2, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
+    "react/jsx-props-no-spreading": 0,
+    "import/no-unresolved": 0,
+    "import/extensions": 0,
+    "react/require-default-props": 0,
+    "react/function-component-definition": [
+      2,
+      {
+        "namedComponents": "arrow-function",
+        "unnamedComponents": "arrow-function"
+      }
+    ],
+    // Disabled, we only require label to nest input OR use htmlFor
+        // https://github.com/evcohen/eslint-plugin-jsx-a11y/blob/b800f40a2a69ad48015ae9226fbe879f946757ed/docs/rules/label-has-associated-control.md
+        "jsx-a11y/label-has-associated-control": ["off", {
+          "labelComponents": [],
+          "labelAttributes": [],
+          "controlComponents": [],
+          "assert": "both",
+          "depth": 25
+        }],
+        // Require that Labels nest their input or uses htmlFor
+        // https://github.com/evcohen/eslint-plugin-jsx-a11y/blob/master/docs/rules/label-has-for.md
+        "jsx-a11y/label-has-for": ["error", {
+          "components": [],
+          "required": {
+            "some": ["nesting", "id"]
+          },
+          "allowChildren": false
+        }]
+  }
+}
