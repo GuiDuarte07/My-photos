@@ -3,6 +3,7 @@ import { GetStaticProps } from 'next/types';
 import prisma from '../lib/prismadb';
 
 import FolderList from '../components/Folder';
+import HomeFolderList from '../components/HomeFolder';
 
 type Props = {
   folders: { id: string; name: string }[];
@@ -10,10 +11,10 @@ type Props = {
 const Home: NextPage<Props> = ({ folders }) => {
   return (
     <>
-      <title>te amo mor {'<3'}</title>
+      <title>te amo mor s3</title>
       <div className="w-full">
         <div className="">
-          <FolderList parentId={null} folders={folders} />
+          <HomeFolderList parentId={null} folders={folders} />
         </div>
       </div>
     </>
