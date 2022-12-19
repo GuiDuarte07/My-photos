@@ -22,15 +22,29 @@ type Props = {
   folders: Folders;
   folderId: string;
   parentId: string;
+  name: string;
 };
 
-const Home: NextPage<Props> = ({ images, folders, folderId, parentId }) => {
+const Home: NextPage<Props> = ({
+  name,
+  images,
+  folders,
+  folderId,
+  parentId,
+}) => {
   return (
-    <div className="w-full">
-      {folders && (
-        <FolderList folderId={folderId} folders={folders} parentId={parentId} />
-      )}
-    </div>
+    <>
+      <title>{name}</title>
+      <div className="w-full">
+        {folders && (
+          <FolderList
+            folderId={folderId}
+            folders={folders}
+            parentId={parentId}
+          />
+        )}
+      </div>
+    </>
   );
 };
 
@@ -52,6 +66,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   let images: Images | null;
   let folders: Folders | null = [];
   let parentId: string | '' = '';
+  let name: string;
 
   try {
     images = await prisma.image.findMany({
@@ -70,6 +85,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       where: { id: folderId },
       select: {
         parent_id: true,
+        name: true,
         children: {
           select: {
             name: true,
@@ -81,6 +97,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
     folders = childrens?.children.map(({ id, name }) => ({ id, name })) ?? null;
     parentId = childrens?.parent_id ?? '';
+    name = childrens?.name ?? '';
   } catch (e) {
     console.log(e);
     return {
@@ -93,6 +110,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       images,
       folders,
       folderId,
+      name,
       parentId,
     },
   };

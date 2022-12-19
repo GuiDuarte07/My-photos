@@ -1,11 +1,7 @@
 import { NextPage } from 'next';
-import Link from 'next/dist/client/link';
 import { GetStaticProps } from 'next/types';
 import prisma from '../lib/prismadb';
 
-import { AiFillFolderOpen } from 'react-icons/ai';
-import { FaFolderPlus } from 'react-icons/fa';
-import { MdOutlineKeyboardBackspace } from 'react-icons/md';
 import FolderList from '../components/Folder';
 
 type Props = {
@@ -13,11 +9,14 @@ type Props = {
 };
 const Home: NextPage<Props> = ({ folders }) => {
   return (
-    <div className="w-full">
-      <div className="">
-        <FolderList parentId={null} folders={folders} />
+    <>
+      <title>te amo mor {'<3'}</title>
+      <div className="w-full">
+        <div className="">
+          <FolderList parentId={null} folders={folders} />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
