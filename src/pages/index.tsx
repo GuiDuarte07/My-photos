@@ -15,7 +15,7 @@ const Home: NextPage<Props> = ({ folders }) => {
   return (
     <div className="w-full">
       <div className="">
-        <FolderList folders={folders} />
+        <FolderList parentId={null} folders={folders} />
       </div>
     </div>
   );

@@ -81,8 +81,6 @@ export const getServerSideProps: GetServerSideProps = async ({
 
     folders = childrens?.children.map(({ id, name }) => ({ id, name })) ?? null;
     parentId = childrens?.parent_id ?? '';
-
-    console.log(parentId);
   } catch (e) {
     console.log(e);
     return {

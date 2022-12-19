@@ -10,7 +10,7 @@ import refreshProps from '../../utils/refreshProps';
 const FolderList: React.FC<{
   folders: { id: string; name: string }[];
   folderId?: string;
-  parentId: string;
+  parentId: string | null;
 }> = ({ folders, folderId, parentId }) => {
   const [folderName, setFolderName] = useState('');
   const [search, setSearch] = useState(false);
@@ -33,13 +33,15 @@ const FolderList: React.FC<{
   return (
     <div>
       <div className="pl-4 py-2 rounded m-2 border border-blue-400 flex items-center gap-8">
-        <Link
-          href={`/${parentId}`}
-          className="transition-allrounded px-2 py-1 flex items-center gap-2 text-black text-sm font-mono border-b-2 border-b-cyan-600"
-        >
-          <MdOutlineKeyboardBackspace />
-          <span className="">Voltar</span>
-        </Link>
+        {parentId !== null && (
+          <Link
+            href={`/${parentId}`}
+            className="transition-allrounded px-2 py-1 flex items-center gap-2 text-black text-sm font-mono border-b-2 border-b-cyan-600"
+          >
+            <MdOutlineKeyboardBackspace />
+            <span className="">Voltar</span>
+          </Link>
+        )}
         {folders.map(({ name, id }) => {
           return (
             <Link
