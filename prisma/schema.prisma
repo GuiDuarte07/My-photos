@@ -65,7 +65,7 @@ model User {
 
 model Folder {
   id        String   @id @default(cuid())
-  name      String   @unique
+  name      String
   secret    String?  @db.Char(6)
   createdAt DateTime @default(now())
 
@@ -88,11 +88,11 @@ model Image {
   size      BigInt
   awsKey    String
 
-  keyword       Keyword[]
-  ImageFolder   Folder    @relation(fields: [imageFolderId], references: [id])
-  imageFolderId String
+  keyword  Keyword[]
+  folder   Folder    @relation(fields: [folderId], references: [id])
+  folderId String
 
-  @@index([imageFolderId])
+  @@index([folderId])
 }
 
 model Keyword {
