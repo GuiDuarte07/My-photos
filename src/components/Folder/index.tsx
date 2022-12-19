@@ -1,16 +1,20 @@
 import axios from 'axios';
+import { useRouter } from 'next/dist/client/router';
 import Link from 'next/link';
 import { useState } from 'react';
 import { AiFillFolderOpen } from 'react-icons/ai';
 import { FaFolderPlus } from 'react-icons/fa';
 import { MdOutlineKeyboardBackspace } from 'react-icons/md';
+import refreshProps from '../../utils/refreshProps';
 
 const FolderList: React.FC<{
   folders: { id: string; name: string }[];
   folderId?: string;
-}> = ({ folders, folderId }) => {
+  parentId: string;
+}> = ({ folders, folderId, parentId }) => {
   const [folderName, setFolderName] = useState('');
   const [search, setSearch] = useState(false);
+  const router = useRouter();
 
   function createFolder() {
     axios.post('/api/folder', {
@@ -18,6 +22,7 @@ const FolderList: React.FC<{
       ...(folderId && { parentId: folderId }),
     });
     setSearch(false);
+    refreshProps(router);
   }
 
   function openSearch() {
@@ -29,7 +34,7 @@ const FolderList: React.FC<{
     <div>
       <div className="pl-4 py-2 rounded m-2 border border-blue-400 flex items-center gap-8">
         <Link
-          href="/"
+          href={`/${parentId}`}
           className="transition-allrounded px-2 py-1 flex items-center gap-2 text-black text-sm font-mono border-b-2 border-b-cyan-600"
         >
           <MdOutlineKeyboardBackspace />
