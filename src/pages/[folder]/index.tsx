@@ -2,6 +2,7 @@ import { NextPage } from 'next';
 import Link from 'next/dist/client/link';
 import { GetServerSideProps } from 'next/types';
 import FolderList from '../../components/Folder';
+import NoneImage from '../../components/NoneImage';
 import prisma from '../../lib/prismadb';
 
 type Images =
@@ -43,6 +44,9 @@ const Home: NextPage<Props> = ({
             parentId={parentId}
           />
         )}
+        <div className="w-full h-96">
+          <NoneImage />
+        </div>
       </div>
     </>
   );
