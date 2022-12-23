@@ -4,6 +4,7 @@ import prisma from '../lib/prismadb';
 
 import FolderList from '../components/Folder';
 import HomeFolderList from '../components/HomeFolder';
+import Header from '../components/Header';
 
 type Props = {
   folders: { id: string; name: string }[];
@@ -12,6 +13,7 @@ const Home: NextPage<Props> = ({ folders }) => {
   return (
     <>
       <title>te amo mor s3</title>
+      <Header />
       <div className="w-full">
         <div className="">
           <HomeFolderList parentId={null} folders={folders} />
