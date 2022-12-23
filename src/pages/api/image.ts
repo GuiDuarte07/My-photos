@@ -33,7 +33,7 @@ apiRoute.post(async (req: IImageApiNextApiRequest, res: NextApiResponse) => {
         mimetype,
         size,
         awsKey: key,
-        ImageFolder: {
+        folder: {
           connect: {
             id: folderId,
           },
@@ -52,5 +52,7 @@ apiRoute.post(async (req: IImageApiNextApiRequest, res: NextApiResponse) => {
 
   res.status(200).send('sucess');
 });
+
+/* apiRoute.delete */
 
 export default apiRoute;
