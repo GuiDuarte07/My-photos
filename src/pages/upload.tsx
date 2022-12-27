@@ -2,11 +2,17 @@ import { NextPage } from 'next';
 import { GetStaticProps } from 'next/types';
 import prisma from '../lib/prismadb';
 import Header from '../components/Header';
-import React, { useState } from 'react';
+import React, { useReducer, useState } from 'react';
 import Image from 'next/image';
+import {
+  actionsUploadEnum,
+  uploadReducer,
+  UploadReducer,
+} from '../hooks/uploadReducer';
 
 const Upload: NextPage = () => {
   const [image, setImage] = useState<FileList | []>([]);
+  const [imageData, dispatchUpload] = useReducer(uploadReducer, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -63,18 +69,37 @@ const Upload: NextPage = () => {
                 type="file"
                 className="hidden"
                 multiple
-                onChange={(e) => setImage(e.target.files ?? [])}
+                onChange={(e) => {
+                  dispatchUpload({
+                    type: actionsUploadEnum.UPLOAD,
+                    files: e.target.files,
+                  });
+                }}
               />
             </label>
           </div>
-          <h1 className="">Imagens que serão enviadas</h1>
+          <h1 className="text-lg">Imagens que serão enviadas</h1>
           <div className="w-full grid-cols-3 gap-8 grid">
-            {Array.from(image).map((img) => (
-              <div key={img.name} className="w-full h-52 relative">
-                <Image
-                  alt={img.name}
-                  src={img ? URL.createObjectURL(img) : ''}
-                  fill
+            {imageData.map(({ file, title }, index) => (
+              <div key={file.name} className="">
+                <div className="w-full h-52 relative">
+                  <Image
+                    alt={title}
+                    src={file ? URL.createObjectURL(file) : ''}
+                    fill
+                  />
+                </div>
+                <input
+                  type="text"
+                  className="w-full my-1 pl-1 p-2 outline-none border-b-2 border-black"
+                  value={title}
+                  onChange={(e) =>
+                    dispatchUpload({
+                      type: actionsUploadEnum.CHANGETITLE,
+                      text: e.target.value,
+                      payload: index,
+                    })
+                  }
                 />
               </div>
             ))}
