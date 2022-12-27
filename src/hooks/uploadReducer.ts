@@ -1,19 +1,22 @@
+type Keywords = { name: string; id?: string }[];
+
 export type UploadReducer = {
   file: File;
   title: string;
-  keywords: string[];
+  keywords: Keywords;
 }[];
 
 export enum actionsUploadEnum {
   UPLOAD = 'UPLOAD',
   CHANGETITLE = 'CHANGETITLE',
-  CHANGEKEYWORDS = 'CHANGEKEYWORDS',
+  DELETEKEYWORD = 'DELETEKEYWORD',
 }
 type UploadAction = {
   type: actionsUploadEnum;
   payload?: number;
   files?: FileList | null;
   text?: string;
+  keywordName?: string;
 };
 
 export function uploadReducer(
@@ -29,7 +32,17 @@ export function uploadReducer(
           newState.push({
             file,
             title: file.name,
-            keywords: [],
+            keywords: [
+              { id: 'eweweqeas', name: 'teste1dasdsadasdsad' },
+              { id: 'eweweqe2as', name: 'teste2' },
+              { id: 'eweweq1eas', name: 'tesdsadasdzste3' },
+              { id: 'eweweq2eas', name: 'teste4' },
+              {
+                id: 'ewewaeqeas',
+                name: 'texczxcxzczzsdwdwdawaed waddwa wdawds ste5',
+              },
+              { name: 'teste6' },
+            ],
           });
         });
       }
@@ -37,6 +50,16 @@ export function uploadReducer(
     case actionsUploadEnum.CHANGETITLE:
       if (typeof action.payload === 'number') {
         newState[action.payload].title = action.text ?? '';
+      }
+      break;
+    case actionsUploadEnum.DELETEKEYWORD:
+      if (action.keywordName && typeof action.payload === 'number') {
+        const deleteIdx = newState[action.payload].keywords
+          .map((words) => words.name)
+          .indexOf(action.keywordName);
+
+        deleteIdx > -1 &&
+          newState[action.payload].keywords.splice(deleteIdx, 1);
       }
       break;
     default:

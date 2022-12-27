@@ -9,9 +9,9 @@ import {
   uploadReducer,
   UploadReducer,
 } from '../hooks/uploadReducer';
+import { TiDelete } from 'react-icons/ti';
 
 const Upload: NextPage = () => {
-  const [image, setImage] = useState<FileList | []>([]);
   const [imageData, dispatchUpload] = useReducer(uploadReducer, []);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -19,9 +19,9 @@ const Upload: NextPage = () => {
 
     const formData = new FormData();
 
-    Array.from(image).forEach((img) => {
+    /* Array.from(image).forEach((img) => {
       formData.append('file', img);
-    });
+    }); */
   };
 
   return (
@@ -80,8 +80,8 @@ const Upload: NextPage = () => {
           </div>
           <h1 className="text-lg">Imagens que serão enviadas</h1>
           <div className="w-full grid-cols-3 gap-8 grid">
-            {imageData.map(({ file, title }, index) => (
-              <div key={file.name} className="">
+            {imageData.map(({ file, title, keywords }, index) => (
+              <div key={file.name} className="border-2 border-black p-1">
                 <div className="w-full h-52 relative">
                   <Image
                     alt={title}
@@ -101,6 +101,29 @@ const Upload: NextPage = () => {
                     })
                   }
                 />
+                <h3 className="text-sm font-bold mb-1">Palavras chaves</h3>
+                <div className="w-full flex flex-wrap gap-2">
+                  {keywords.map((word) => (
+                    <div
+                      className="bg-gray-300 px-1 flex gap-2 text-center"
+                      key={word.id ?? word.name}
+                    >
+                      <p>{word.name}</p>
+                      <button
+                        onClick={() =>
+                          dispatchUpload({
+                            type: actionsUploadEnum.DELETEKEYWORD,
+                            payload: index,
+                            keywordName: word.name,
+                          })
+                        }
+                        className="text-red-500"
+                      >
+                        <TiDelete />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
