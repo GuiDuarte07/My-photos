@@ -10,6 +10,7 @@ export enum actionsUploadEnum {
   UPLOAD = 'UPLOAD',
   CHANGETITLE = 'CHANGETITLE',
   DELETEKEYWORD = 'DELETEKEYWORD',
+  NEWKEYWORD = 'NEWKEYWORD',
 }
 type UploadAction = {
   type: actionsUploadEnum;
@@ -34,17 +35,7 @@ export function uploadReducer(
           newState.push({
             file,
             title: file.name,
-            keywords: [
-              { id: 'eweweqeas', name: 'teste1dasdsadasdsad' },
-              { id: 'eweweqe2as', name: 'teste2' },
-              { id: 'eweweq1eas', name: 'tesdsadasdzste3' },
-              { id: 'eweweq2eas', name: 'teste4' },
-              {
-                id: 'ewewaeqeas',
-                name: 'texczxcxzczzsdwdwdawaed waddwa wdawds ste5',
-              },
-              { name: 'teste6' },
-            ],
+            keywords: [{ id: 'e2we', name: 'dasdaj isodjsaoid ajso' }],
           });
         });
       }
@@ -64,6 +55,16 @@ export function uploadReducer(
           newState[action.payload].keywords.splice(deleteIdx, 1);
       }
       break;
+    case actionsUploadEnum.NEWKEYWORD:
+      if (action.keywordName && typeof action.payload === 'number') {
+        const sameKeyword = newState[action.payload].keywords
+          .map((words) => words.name)
+          .indexOf(action.keywordName);
+
+        sameKeyword === -1 &&
+          newState[action.payload].keywords.push({ name: action.keywordName });
+        break;
+      }
     default:
       throw new Error();
   }

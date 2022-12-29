@@ -2,7 +2,7 @@ import { NextPage } from 'next';
 import { GetStaticProps } from 'next/types';
 import prisma from '../lib/prismadb';
 import Header from '../components/Header';
-import React, { useReducer, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import Image from 'next/image';
 import {
   actionsUploadEnum,
@@ -10,10 +10,15 @@ import {
   UploadReducer,
 } from '../hooks/uploadReducer';
 import { TiDelete } from 'react-icons/ti';
+import { RiAddBoxFill } from 'react-icons/ri';
+import { AiFillCloseSquare } from 'react-icons/ai';
 
 const Upload: NextPage = () => {
   const [imageData, dispatchUpload] = useReducer(uploadReducer, []);
   const [uploadError, setUploadError] = useState(false);
+  const [newTextKeyword, setNewTextKeyword] = useState(-1);
+  //-1 para desativo e 0+ para ativado, o número diz qual dos indices do imageData vai adicionar um novo keyword
+  const [textKeyword, setTextKeyword] = useState('');
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -39,6 +44,12 @@ const Upload: NextPage = () => {
       files: e.target.files,
     });
   };
+
+  useEffect(() => {
+    if (newTextKeyword === -1) {
+      setTextKeyword('');
+    }
+  }, [newTextKeyword]);
 
   return (
     <>
@@ -96,7 +107,7 @@ const Upload: NextPage = () => {
             </p>
           )}
 
-          <div className="w-full grid-cols-3 gap-8 grid">
+          <div className="w-full grid-cols-3 grid-rows-none gap-8 grid">
             {imageData.map(({ file, title, keywords }, index) => (
               <div key={file.name} className="border-2 border-black p-1">
                 <div className="w-full h-52 relative">
@@ -140,7 +151,40 @@ const Upload: NextPage = () => {
                       </button>
                     </div>
                   ))}
+                  {newTextKeyword === -1 && (
+                    <button
+                      onClick={() => setNewTextKeyword(index)}
+                      className=""
+                    >
+                      <RiAddBoxFill className="text-cyan-600" size={24} />
+                    </button>
+                  )}
                 </div>
+                {newTextKeyword === index && (
+                  <div className="flex w-full h-6 my-2 items-center">
+                    <input
+                      type="search"
+                      value={textKeyword}
+                      onChange={(e) => setTextKeyword(e.target.value)}
+                      className="bg-none h-full flex-1 outline-none border-2 pl-1 border-cyan-900"
+                    />
+                    <button
+                      onClick={() => {
+                        setNewTextKeyword(-1);
+                        dispatchUpload({
+                          type: actionsUploadEnum.NEWKEYWORD,
+                          keywordName: textKeyword,
+                          payload: index,
+                        });
+                      }}
+                    >
+                      <RiAddBoxFill size={28} className="text-cyan-600" />
+                    </button>
+                    <button onClick={() => setNewTextKeyword(-1)}>
+                      <AiFillCloseSquare className="text-red-600" size={28} />
+                    </button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
