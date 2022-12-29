@@ -29,6 +29,8 @@ export function uploadReducer(
     case actionsUploadEnum.UPLOAD:
       if (action.files) {
         Array.from(action.files).forEach((file) => {
+          if (!file.type.includes('image')) return;
+
           newState.push({
             file,
             title: file.name,

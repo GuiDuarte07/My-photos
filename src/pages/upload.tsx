@@ -13,6 +13,7 @@ import { TiDelete } from 'react-icons/ti';
 
 const Upload: NextPage = () => {
   const [imageData, dispatchUpload] = useReducer(uploadReducer, []);
+  const [uploadError, setUploadError] = useState(false);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -22,6 +23,21 @@ const Upload: NextPage = () => {
     /* Array.from(image).forEach((img) => {
       formData.append('file', img);
     }); */
+  };
+
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files) return;
+    setUploadError(false);
+    Array.from(e.target.files).forEach((file) => {
+      if (!file.type.includes('image')) {
+        setUploadError(true);
+        return;
+      }
+    });
+    dispatchUpload({
+      type: actionsUploadEnum.UPLOAD,
+      files: e.target.files,
+    });
   };
 
   return (
@@ -69,16 +85,17 @@ const Upload: NextPage = () => {
                 type="file"
                 className="hidden"
                 multiple
-                onChange={(e) => {
-                  dispatchUpload({
-                    type: actionsUploadEnum.UPLOAD,
-                    files: e.target.files,
-                  });
-                }}
+                onChange={(e) => handleImageUpload(e)}
               />
             </label>
           </div>
           <h1 className="text-lg">Imagens que serão enviadas</h1>
+          {uploadError && (
+            <p className="text-red-500 text-sm">
+              Um ou mais arquivos falharam na importação
+            </p>
+          )}
+
           <div className="w-full grid-cols-3 gap-8 grid">
             {imageData.map(({ file, title, keywords }, index) => (
               <div key={file.name} className="border-2 border-black p-1">
@@ -127,8 +144,13 @@ const Upload: NextPage = () => {
               </div>
             ))}
           </div>
-          <label htmlFor="submitImages">Enviar imagens</label>
-          <input type="submit" value="submitImages" />
+          <label
+            className="cursor-pointer hover:bg-slate-600 transition-all place-self-center py-3 px-5 bg-slate-700 w-fit rounded text-white"
+            htmlFor="submitImages"
+          >
+            Enviar imagens
+          </label>
+          <input type="submit" id="submitImages" className="hidden" />
         </form>
       </div>
     </>
