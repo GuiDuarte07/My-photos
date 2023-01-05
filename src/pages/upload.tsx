@@ -73,12 +73,17 @@ const Upload: NextPage = () => {
     };
 
     if (fullScreenImage > -1) {
+      document.body.style.overflow = 'hidden';
       window.addEventListener('keydown', keyPressHandle);
     } else {
       window.removeEventListener('keydown', keyPressHandle);
+      document.body.style.overflow = 'scroll';
     }
 
-    return () => window.removeEventListener('keydown', keyPressHandle);
+    return () => {
+      window.removeEventListener('keydown', keyPressHandle);
+      document.body.style.overflow = 'scroll';
+    };
   }, [fullScreenImage]);
 
   return (
