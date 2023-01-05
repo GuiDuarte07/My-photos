@@ -12,12 +12,18 @@ import {
 import { TiDelete } from 'react-icons/ti';
 import { RiAddBoxFill } from 'react-icons/ri';
 import { AiFillCloseSquare } from 'react-icons/ai';
+import {
+  BsX,
+  BsFillArrowLeftCircleFill,
+  BsFillArrowRightCircleFill,
+} from 'react-icons/bs';
 
 const Upload: NextPage = () => {
   const [imageData, dispatchUpload] = useReducer(uploadReducer, []);
   const [uploadError, setUploadError] = useState(false);
   const [newTextKeyword, setNewTextKeyword] = useState(-1);
   //-1 para desativo e 0+ para ativado, o número diz qual dos indices do imageData vai adicionar um novo keyword
+  const [fullScreenImage, setFullScreenImage] = useState(-1);
   const [textKeyword, setTextKeyword] = useState('');
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -51,10 +57,85 @@ const Upload: NextPage = () => {
     }
   }, [newTextKeyword]);
 
+  useEffect(() => {
+    const keyPressHandle = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setFullScreenImage(-1);
+      }
+
+      if (e.key === 'ArrowRight' && fullScreenImage < imageData.length - 1) {
+        setFullScreenImage((prev) => prev + 1);
+      }
+
+      if (e.key === 'ArrowLeft' && fullScreenImage > 0) {
+        setFullScreenImage((prev) => prev - 1);
+      }
+    };
+
+    if (fullScreenImage > -1) {
+      window.addEventListener('keydown', keyPressHandle);
+    } else {
+      window.removeEventListener('keydown', keyPressHandle);
+    }
+
+    return () => window.removeEventListener('keydown', keyPressHandle);
+  }, [fullScreenImage]);
+
   return (
     <>
       <title>Importar imagens</title>
       <Header />
+      {fullScreenImage > -1 && imageData[fullScreenImage] && (
+        <div
+          onClick={() => setFullScreenImage(-1)}
+          className="z-20 h-screen w-screen fixed bg-opacity-80 bg-slate-700 top-0 overflow-hidden flex justify-center items-center"
+        >
+          <div className="flex items-center gap-8">
+            <button
+              className="z-30"
+              style={{ visibility: fullScreenImage > 0 ? 'visible' : 'hidden' }}
+              onClick={(e) => {
+                e.stopPropagation();
+                setFullScreenImage(fullScreenImage - 1);
+              }}
+            >
+              <BsFillArrowLeftCircleFill
+                size={36}
+                className="text-white opacity-80"
+              />
+            </button>
+
+            <img
+              className="max-w-5xl"
+              onClick={(e) => e.stopPropagation()}
+              alt={imageData[fullScreenImage].title}
+              src={
+                imageData[fullScreenImage].file
+                  ? URL.createObjectURL(imageData[fullScreenImage].file)
+                  : ''
+              }
+            />
+            <button
+              style={{
+                visibility:
+                  fullScreenImage >= imageData.length - 1
+                    ? 'hidden'
+                    : 'visible',
+              }}
+              className="z-30"
+              onClick={(e) => {
+                e.stopPropagation();
+                setFullScreenImage(fullScreenImage + 1);
+              }}
+            >
+              <BsFillArrowRightCircleFill
+                size={36}
+                className="text-white opacity-80"
+              />
+            </button>
+          </div>
+        </div>
+      )}
       <div className="w-full flex items-center flex-col">
         <form
           onSubmit={(e) => handleSubmit(e)}
@@ -109,12 +190,29 @@ const Upload: NextPage = () => {
 
           <div className="w-full grid-cols-3 grid-rows-none gap-8 grid">
             {imageData.map(({ file, title, keywords }, index) => (
-              <div key={file.name} className="border-2 border-black p-1">
-                <div className="w-full h-52 relative">
+              <div
+                key={file.name}
+                className="border-2 border-black p-1 relative"
+              >
+                <div className="z-10 rounded-full h-8 w-8 bg-red-600 top-[-16px] right-[-16px] absolute flex justify-center items-center">
+                  <button
+                    onClick={() =>
+                      dispatchUpload({
+                        type: actionsUploadEnum.REMOVEUPLOAD,
+                        payload: index,
+                      })
+                    }
+                  >
+                    <BsX size={28} className="text-white" />
+                  </button>
+                </div>
+
+                <div className="w-full h-52 relative cursor-pointer">
                   <Image
                     alt={title}
                     src={file ? URL.createObjectURL(file) : ''}
                     fill
+                    onClick={() => setFullScreenImage(index)}
                   />
                 </div>
                 <input
@@ -133,10 +231,12 @@ const Upload: NextPage = () => {
                 <div className="w-full flex flex-wrap gap-2">
                   {keywords.map((word) => (
                     <div
-                      className="bg-gray-300 px-1 flex gap-2 text-center"
+                      className="bg-gray-300 px-1 gap-2 flex text-center max-w-full"
                       key={word.id ?? word.name}
                     >
-                      <p>{word.name}</p>
+                      <p className="mr-1 flex-1 text-ellipsis overflow-hidden">
+                        {word.name}
+                      </p>
                       <button
                         onClick={() =>
                           dispatchUpload({
@@ -145,9 +245,9 @@ const Upload: NextPage = () => {
                             keywordName: word.name,
                           })
                         }
-                        className="text-red-500"
+                        className="h-full text-red-500 "
                       >
-                        <TiDelete />
+                        <TiDelete className="mx-auto" />
                       </button>
                     </div>
                   ))}
@@ -189,7 +289,7 @@ const Upload: NextPage = () => {
             ))}
           </div>
           <label
-            className="cursor-pointer hover:bg-slate-600 transition-all place-self-center py-3 px-5 bg-slate-700 w-fit rounded text-white"
+            className="cursor-pointer hover:bg-slate-600 transition-all place-self-center py-3 px-5 bg-slate-700 w-fit rounded text-white mb-2"
             htmlFor="submitImages"
           >
             Enviar imagens

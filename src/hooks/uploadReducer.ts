@@ -8,6 +8,7 @@ export type UploadReducer = {
 
 export enum actionsUploadEnum {
   UPLOAD = 'UPLOAD',
+  REMOVEUPLOAD = 'REMOVEUPLOAD',
   CHANGETITLE = 'CHANGETITLE',
   DELETEKEYWORD = 'DELETEKEYWORD',
   NEWKEYWORD = 'NEWKEYWORD',
@@ -38,6 +39,11 @@ export function uploadReducer(
             keywords: [{ id: 'e2we', name: 'dasdaj isodjsaoid ajso' }],
           });
         });
+      }
+      break;
+    case actionsUploadEnum.REMOVEUPLOAD:
+      if (typeof action.payload === 'number') {
+        newState.splice(action.payload, 1);
       }
       break;
     case actionsUploadEnum.CHANGETITLE:

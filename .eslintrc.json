@@ -6,6 +6,7 @@
   "plugins": ["@typescript-eslint", "prettier"],
   "extends": ["next/core-web-vitals", "plugin:@typescript-eslint/recommended", "prettier"],
   "rules": {
+    "@next/next/no-img-element": "off",
     "prettier/prettier": 2, // Means error
     "react/jsx-filename-extension": [2, { "extensions": [".js", ".jsx", ".ts", ".tsx"] }],
     "react/jsx-props-no-spreading": 0,
