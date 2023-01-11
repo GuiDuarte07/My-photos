@@ -1,38 +1,19 @@
-import { NextPage } from 'next';
-import { GetStaticProps } from 'next/types';
-import prisma from '../lib/prismadb';
+import { GetServerSideProps, NextPage } from 'next';
+import { unstable_getServerSession } from 'next-auth';
+import { authOptions } from './api/auth/[...nextauth]';
 
-import FolderList from '../components/Folder';
-import HomeFolderList from '../components/HomeFolder';
-import Header from '../components/Header';
+const Home: NextPage = () => <div>:D</div>;
 
-type Props = {
-  folders: { id: string; name: string }[];
-};
-const Home: NextPage<Props> = ({ folders }) => {
-  return (
-    <>
-      <title>te amo mor s3</title>
-      <Header />
-      <div className="w-full">
-        <div className="">
-          <HomeFolderList parentId={null} folders={folders} />
-        </div>
-      </div>
-    </>
-  );
-};
+export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+  const session = await unstable_getServerSession(req, res, authOptions);
 
-export const getStaticProps: GetStaticProps = async () => {
-  const folders = await prisma.folder.findMany({
-    where: { parent: { is: null } },
-    select: { id: true, name: true },
-  });
+  if (!session?.user)
+    return {
+      redirect: { destination: '/404', permanent: false },
+    };
 
   return {
-    props: {
-      folders,
-    },
+    redirect: { destination: `/${session.user.id}`, permanent: false },
   };
 };
 

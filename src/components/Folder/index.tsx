@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/dist/client/router';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -15,6 +16,7 @@ const FolderList: React.FC<{
   const [folderName, setFolderName] = useState('');
   const [search, setSearch] = useState(false);
   const router = useRouter();
+  const { data: sessionData } = useSession();
 
   function createFolder() {
     axios.post('/api/folder', {
@@ -47,7 +49,7 @@ const FolderList: React.FC<{
             <Link
               className="transition-all hover:bg-cyan-500 bg-cyan-400 rounded px-2 py-1 flex items-center gap-2 text-white text-sm font-mono"
               key={id}
-              href={`/${id}`}
+              href={`/${sessionData?.user.id}/${id}`}
             >
               <AiFillFolderOpen />
               <span className="">{name}</span>

@@ -7,19 +7,20 @@ import prisma from '../../../lib/prismadb';
 export const authOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
-    GithubProvider({
-      clientId: process.env.GITHUB_ID,
-      clientSecret: process.env.GITHUB_SECRET,
-    }),
     /* GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     }), */
+    GithubProvider({
+      clientId: process.env.GITHUB_ID,
+      clientSecret: process.env.GITHUB_SECRET,
+    }),
     // ...add more providers here
   ],
   callbacks: {
     async session({ session, user }) {
       session.user.role = user.role; // Add role value to user object so it is passed along with session
+      session.user.id = user.id;
       return session;
     },
   },

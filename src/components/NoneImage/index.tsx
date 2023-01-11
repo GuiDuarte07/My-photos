@@ -1,4 +1,5 @@
 import { CiImageOff } from 'react-icons/ci';
+import Link from 'next/link';
 
 const NoneImage: React.FC = () => {
   return (
@@ -10,9 +11,12 @@ const NoneImage: React.FC = () => {
       <h2 className="mt-2 font-bold text-xl text-cyan-900">
         Gostaria adicionar uma nova foto?
       </h2>
-      <button className="mt-8 transition-all hover:bg-cyan-800 bg-cyan-600 rounded p-3 flex flex-col items-center justify-around gap-2 text-white text-sm">
+      <Link
+        href="/upload"
+        className="mt-8 transition-all hover:bg-cyan-800 bg-cyan-600 rounded p-3 flex flex-col items-center justify-around gap-2 text-white text-sm"
+      >
         Adicionar imagem
-      </button>
+      </Link>
     </div>
   );
 };

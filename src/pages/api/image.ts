@@ -3,6 +3,9 @@ import { deleteFromAWS, upload } from '../../utils/awsS3';
 import prisma from '../../lib/prismadb';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { IImageApiNextApiRequest } from '../../../types/types';
+import { unstable_getServerSession } from 'next-auth/next';
+import { authOptions } from './auth/[...nextauth]';
+import { KeyObject } from 'crypto';
 
 export const config = {
   api: {
@@ -25,6 +28,12 @@ apiRoute.post(async (req: IImageApiNextApiRequest, res: NextApiResponse) => {
     file: { location: url, mimetype, size, key },
   } = req;
 
+  const session = await unstable_getServerSession(req, res, authOptions);
+
+  if (!session?.user) {
+    return res.status(400).send('not allowed');
+  }
+
   try {
     await prisma.image.create({
       data: {
@@ -33,6 +42,7 @@ apiRoute.post(async (req: IImageApiNextApiRequest, res: NextApiResponse) => {
         mimetype,
         size,
         awsKey: key,
+        user: { connect: { id: session.user.id } },
         folder: {
           connect: {
             id: folderId,
@@ -40,7 +50,7 @@ apiRoute.post(async (req: IImageApiNextApiRequest, res: NextApiResponse) => {
         },
         keyword: {
           createMany: {
-            data: keyword,
+            data: keyword.map((key) => ({ ...key, userId: session.user.id })),
           },
         },
       },

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/dist/client/router';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -15,12 +16,17 @@ const HomeFolderList: React.FC<{
   const [folderName, setFolderName] = useState('');
   const [search, setSearch] = useState(false);
   const router = useRouter();
+  const { data: sessionData } = useSession();
 
   function createFolder() {
-    axios.post('/api/folder', {
-      name: folderName,
-      ...(folderId && { parentId: folderId }),
-    });
+    try {
+      axios.post('/api/folder', {
+        name: folderName,
+        ...(folderId && { parentId: folderId }),
+      });
+    } catch (e) {
+      console.log(e);
+    }
     setSearch(false);
     refreshProps(router);
   }
@@ -38,7 +44,7 @@ const HomeFolderList: React.FC<{
             <Link
               className="w-32 h-24 transition-all hover:bg-cyan-500 bg-cyan-400 rounded px-2 py-1 flex flex-col items-center justify-around gap-2 text-white text-sm font-mono"
               key={id}
-              href={`/${id}`}
+              href={`/${sessionData?.user.id}/${id}`}
             >
               <AiFillFolderOpen size={32} />
               <span className="">{name}</span>

@@ -10,7 +10,9 @@ const Header: React.FC = () => {
   return (
     <header className="h-14 flex items-center justify-between bg-slate-100 px-1">
       <div className="">
-        <h1 className="text-black font-bold">My-photos</h1>
+        <Link href="/" className="text-black font-bold">
+          My-photos
+        </Link>
       </div>
       <input
         placeholder="Pesquisar imagens"

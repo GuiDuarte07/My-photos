@@ -196,7 +196,7 @@ const Upload: NextPage = () => {
           <div className="w-full grid-cols-3 grid-rows-none gap-8 grid">
             {imageData.map(({ file, title, keywords }, index) => (
               <div
-                key={file.name}
+                key={file.name + file.toString + file.lastModified}
                 className="border-2 border-black p-1 relative"
               >
                 <div className="z-10 rounded-full h-8 w-8 bg-red-600 top-[-16px] right-[-16px] absolute flex justify-center items-center">

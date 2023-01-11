@@ -1,9 +1,13 @@
 import { NextPage } from 'next';
+import { unstable_getServerSession } from 'next-auth';
+import { useSession } from 'next-auth/react';
 import Link from 'next/dist/client/link';
 import { GetServerSideProps } from 'next/types';
-import FolderList from '../../components/Folder';
-import NoneImage from '../../components/NoneImage';
-import prisma from '../../lib/prismadb';
+import FolderList from '../../../components/Folder';
+import NoneImage from '../../../components/NoneImage';
+import prisma from '../../../lib/prismadb';
+import { isUser } from '../../../utils/isUser';
+import { authOptions } from '../../api/auth/[...nextauth]';
 
 type Images =
   | {
@@ -57,15 +61,23 @@ export const getServerSideProps: GetServerSideProps = async ({
   res,
   params,
 }) => {
+  console.log(params);
   let folderId: string;
+  let userId: string;
 
-  if (typeof params?.folder === 'string') {
+  if (typeof params?.folder === 'string' && typeof params?.id === 'string') {
     folderId = params?.folder;
+    userId = params?.id;
   } else {
     return {
       redirect: { destination: '/404', permanent: false },
     };
   }
+
+  if (!(await isUser(res, req, userId)))
+    return {
+      redirect: { destination: '/404', permanent: false },
+    };
 
   let images: Images | null;
   let folders: Folders | null = [];
@@ -74,7 +86,7 @@ export const getServerSideProps: GetServerSideProps = async ({
 
   try {
     images = await prisma.image.findMany({
-      where: { folder: { id: folderId } },
+      where: { folder: { id: folderId }, AND: { userId } },
       select: {
         id: true,
         createdAt: true,
