@@ -35,13 +35,13 @@ export const getServerSideProps: GetServerSideProps = async ({
     id = params?.id;
   } else {
     return {
-      redirect: { destination: '/404', permanent: false },
+      redirect: { destination: '/404', permanent: true },
     };
   }
 
   if (!(await isUser(res, req, id)))
     return {
-      redirect: { destination: '/404', permanent: false },
+      redirect: { destination: '/404', permanent: true },
     };
 
   const folders = await prisma.folder.findMany({

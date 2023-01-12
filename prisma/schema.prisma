@@ -81,6 +81,8 @@ model Folder {
   children Folder[] @relation("folder_Children")
   image    Image[]
 
+  keywords Keyword[]
+
   @@index([parent_id])
   @@index([userId])
 }
@@ -109,14 +111,13 @@ model Image {
 model Keyword {
   id      String @id @default(cuid())
   name    String
-  imageId String
-  image   Image  @relation(fields: [imageId], references: [id])
+  image   Image[]
+
+  folder Folder[]
 
   user User @relation(fields: [userId], references: [id])
   userId String
 
-
-  @@index([imageId])
   @@index([userId])
 }
 

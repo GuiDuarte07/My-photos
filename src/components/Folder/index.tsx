@@ -5,18 +5,25 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { AiFillFolderOpen } from 'react-icons/ai';
 import { FaFolderPlus } from 'react-icons/fa';
-import { MdOutlineKeyboardBackspace } from 'react-icons/md';
+import {
+  MdDone,
+  MdOutlineDone,
+  MdOutlineKeyboardBackspace,
+} from 'react-icons/md';
+import { RiAddBoxFill } from 'react-icons/ri';
 import refreshProps from '../../utils/refreshProps';
 
 const FolderList: React.FC<{
-  folders: { id: string; name: string }[];
+  folders: { id: string; name: string }[] | null;
   folderId?: string;
   parentId: string | null;
-}> = ({ folders, folderId, parentId }) => {
+  keywords: { id: string; name: string }[] | null;
+}> = ({ folders, folderId, parentId, keywords }) => {
   const [folderName, setFolderName] = useState('');
   const [search, setSearch] = useState(false);
   const router = useRouter();
   const { data: sessionData } = useSession();
+  const [newKeyword, setNewKeyword] = useState('s');
 
   function createFolder() {
     axios.post('/api/folder', {
@@ -32,6 +39,8 @@ const FolderList: React.FC<{
     setSearch(true);
   }
 
+  const addNewKeyword = () => 'd';
+
   return (
     <div>
       <div className="pl-4 py-2 rounded m-2 border border-blue-400 flex items-center gap-8">
@@ -44,7 +53,7 @@ const FolderList: React.FC<{
             <span className="">Voltar</span>
           </Link>
         )}
-        {folders.map(({ name, id }) => {
+        {folders?.map(({ name, id }) => {
           return (
             <Link
               className="transition-all hover:bg-cyan-500 bg-cyan-400 rounded px-2 py-1 flex items-center gap-2 text-white text-sm font-mono"
@@ -73,6 +82,36 @@ const FolderList: React.FC<{
           <FaFolderPlus size={24} className="" />
           <span>{search ? 'Criar' : 'Adicionar nova pasta'}</span>
         </button>
+      </div>
+      <div className="mt-2">
+        <h2 className="text-sm font-semibold text-cyan-900">
+          Palavras-chaves desta pasta:
+        </h2>
+        <ul className="items-center flex gap-2 border border-blue-800 p-2 m-1">
+          <li className="px-2 py-[1px] rounded-sm bg-blue-50">fdsfsdf</li>
+          <li className="px-2 py-[1px] rounded-sm bg-blue-50">fds dsa fsdf</li>
+          <li className="px-2 py-[1px] rounded-sm bg-blue-50">fdsfsdsa zdf</li>
+          <li className="px-2 py-[1px] rounded-sm bg-blue-50">xc fdsfssdf</li>
+          <li className="px-2 py-[1px] rounded-sm bg-blue-50">fdsfsszsdf</li>
+          {/* {newKeyword === '' ? (
+            <button>
+              <RiAddBoxFill size={24} className="text-blue-500" />
+            </button>
+          ) : (
+            <form onSubmit={() => addNewKeyword()} className="flex gap-2">
+              <input
+                type="search"
+                className="w-52 h-6 p-1 text-sm outline-none border border-blue-200"
+              />
+              <button
+                className="flex items-center justify-center px-1 bg-cyan-900"
+                type="submit"
+              >
+                <MdOutlineDone className="text-white" />
+              </button>
+            </form>
+          )} */}
+        </ul>
       </div>
     </div>
   );

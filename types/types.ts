@@ -32,3 +32,10 @@ export interface IFolderApiNextApiRequest extends NextApiRequest {
     parentId: string;
   };
 }
+
+export interface IKeywordApiNextApiRequest extends NextApiRequest {
+  body: {
+    keyword: string;
+    folderId: string;
+  };
+}

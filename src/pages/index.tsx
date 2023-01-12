@@ -9,11 +9,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
   if (!session?.user)
     return {
-      redirect: { destination: '/404', permanent: false },
+      redirect: { destination: '/api/auth/signin', permanent: true },
     };
 
   return {
-    redirect: { destination: `/${session.user.id}`, permanent: false },
+    redirect: { destination: `/${session.user.id}`, permanent: true },
   };
 };
 

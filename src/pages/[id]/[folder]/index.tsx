@@ -1,3 +1,4 @@
+import { Session } from 'inspector';
 import { NextPage } from 'next';
 import { unstable_getServerSession } from 'next-auth';
 import { useSession } from 'next-auth/react';
@@ -21,6 +22,7 @@ type Images =
   | null;
 
 type Folders = { id: string; name: string }[] | null;
+type Keywords = { id: string; name: string }[] | null;
 
 type Props = {
   images: Images;
@@ -28,6 +30,7 @@ type Props = {
   folderId: string;
   parentId: string;
   name: string;
+  keywords: Keywords;
 };
 
 const Home: NextPage<Props> = ({
@@ -36,6 +39,7 @@ const Home: NextPage<Props> = ({
   folders,
   folderId,
   parentId,
+  keywords,
 }) => {
   return (
     <>
@@ -46,6 +50,7 @@ const Home: NextPage<Props> = ({
             folderId={folderId}
             folders={folders}
             parentId={parentId}
+            keywords={keywords}
           />
         )}
         <div className="w-full h-96">
@@ -61,7 +66,6 @@ export const getServerSideProps: GetServerSideProps = async ({
   res,
   params,
 }) => {
-  console.log(params);
   let folderId: string;
   let userId: string;
 
@@ -70,19 +74,20 @@ export const getServerSideProps: GetServerSideProps = async ({
     userId = params?.id;
   } else {
     return {
-      redirect: { destination: '/404', permanent: false },
+      redirect: { destination: '/404', permanent: true },
     };
   }
 
   if (!(await isUser(res, req, userId)))
     return {
-      redirect: { destination: '/404', permanent: false },
+      redirect: { destination: '/404', permanent: true },
     };
 
   let images: Images | null;
   let folders: Folders | null = [];
   let parentId: string | '' = '';
   let name: string;
+  let keywords: Keywords;
 
   try {
     images = await prisma.image.findMany({
@@ -95,6 +100,13 @@ export const getServerSideProps: GetServerSideProps = async ({
         url: true,
         size: true,
       },
+    });
+
+    keywords = await prisma.keyword.findMany({
+      where: {
+        folder: { some: { id: folderId }, every: { user: { id: userId } } },
+      },
+      select: { id: true, name: true },
     });
 
     const childrens = await prisma.folder.findUnique({
@@ -128,6 +140,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       folderId,
       name,
       parentId,
+      keywords,
     },
   };
 };
