@@ -40,7 +40,11 @@ apiRoute.post(async (req: IKeywordApiNextApiRequest, res: NextApiResponse) => {
       });
     } else {
       await prisma.keyword.create({
-        data: { name: keyword, folderId, userId: session.user.id },
+        data: {
+          name: keyword,
+          folder: { connect: { id: folderId } },
+          userId: session.user.id,
+        },
       });
     }
   } catch (e) {

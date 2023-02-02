@@ -31,6 +31,7 @@ type Props = {
   parentId: string;
   name: string;
   keywords: Keywords;
+  allKeywords: Keywords;
 };
 
 const Home: NextPage<Props> = ({
@@ -40,13 +41,16 @@ const Home: NextPage<Props> = ({
   folderId,
   parentId,
   keywords,
+  allKeywords,
 }) => {
+  console.log(allKeywords);
   return (
     <>
       <title>{name}</title>
       <div className="w-full">
         {folders && (
           <FolderList
+            allKeywords={allKeywords}
             folderId={folderId}
             folders={folders}
             parentId={parentId}
@@ -88,6 +92,7 @@ export const getServerSideProps: GetServerSideProps = async ({
   let parentId: string | '' = '';
   let name: string;
   let keywords: Keywords;
+  let allKeywords: Keywords;
 
   try {
     images = await prisma.image.findMany({
@@ -106,6 +111,11 @@ export const getServerSideProps: GetServerSideProps = async ({
       where: {
         folder: { some: { id: folderId }, every: { user: { id: userId } } },
       },
+      select: { id: true, name: true },
+    });
+
+    allKeywords = await prisma.keyword.findMany({
+      where: { userId },
       select: { id: true, name: true },
     });
 
@@ -141,6 +151,7 @@ export const getServerSideProps: GetServerSideProps = async ({
       name,
       parentId,
       keywords,
+      allKeywords,
     },
   };
 };
