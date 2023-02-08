@@ -1,4 +1,4 @@
-import { IKeywordApiNextApiRequest } from './../../../types/types';
+import { IKeywordApiNextApiRequest } from '../../../types/types';
 import nextConnect from 'next-connect';
 import prisma from '../../lib/prismadb';
 import { NextApiRequest, NextApiResponse } from 'next';
@@ -13,13 +13,9 @@ const apiRoute = nextConnect({
 });
 
 apiRoute.post(async (req: IKeywordApiNextApiRequest, res: NextApiResponse) => {
-  const { keyword, folderId } = req.body;
+  const { keyword } = req.body;
 
-  if (typeof keyword !== 'string' || !keyword)
-    return res.status(400).send('invalid data');
-
-  if (typeof folderId !== 'string' || !folderId)
-    return res.status(400).send('invalid data');
+  if (!keyword) return res.status(400).send('invalid data');
 
   const session = await unstable_getServerSession(req, res, authOptions);
 
@@ -28,25 +24,9 @@ apiRoute.post(async (req: IKeywordApiNextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    const keySearch = await prisma.keyword.findFirst({
-      where: { name: keyword, AND: { userId: session.user.id } },
-      select: { id: true },
+    await prisma.keyword.createMany({
+      data: keyword.map((key) => ({ name: key, userId: session.user.id })),
     });
-
-    if (keySearch?.id) {
-      await prisma.folder.update({
-        where: { id: folderId },
-        data: { keywords: { connect: { id: keySearch.id } } },
-      });
-    } else {
-      await prisma.keyword.create({
-        data: {
-          name: keyword,
-          folder: { connect: { id: folderId } },
-          userId: session.user.id,
-        },
-      });
-    }
   } catch (e) {
     return res.status(400).send('failed');
   }

@@ -21,6 +21,18 @@ import {
   ComboboxOptionText,
 } from '@reach/combobox';
 import '@reach/combobox/styles.css';
+import Modal from 'react-modal';
+
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+  },
+};
 
 const FolderList: React.FC<{
   folders: { id: string; name: string }[] | null;
@@ -30,7 +42,7 @@ const FolderList: React.FC<{
   allKeywords: { id: string; name: string }[] | null;
 }> = ({ folders, folderId, parentId, keywords, allKeywords }) => {
   const [folderName, setFolderName] = useState('');
-  const [search, setSearch] = useState(false);
+  const [folderModal, setFolderModal] = useState(false);
   const router = useRouter();
   const { data: sessionData } = useSession();
   const [newKeyword, setNewKeyword] = useState(false);
@@ -41,13 +53,17 @@ const FolderList: React.FC<{
       name: folderName,
       ...(folderId && { parentId: folderId }),
     });
-    setSearch(false);
+    setFolderModal(false);
     refreshProps(router);
   }
 
-  function openSearch() {
-    setFolderName('');
-    setSearch(true);
+  function openCloseFolderModal() {
+    if (!folderModal) {
+      setFolderModal(true);
+    } else {
+      setFolderName('');
+      setFolderModal(false);
+    }
   }
 
   useEffect(() => {
@@ -58,6 +74,36 @@ const FolderList: React.FC<{
 
   return (
     <div>
+      <Modal
+        isOpen={folderModal}
+        onRequestClose={openCloseFolderModal}
+        style={customStyles}
+        contentLabel="Example Modal"
+      >
+        <form>
+          <h1 className="font-semibold text-lg">Criar nova pasta</h1>
+          <label className="block text-sm" htmlFor="folderName">
+            Nome da pasta
+          </label>
+          <input
+            id="folderName"
+            type="text"
+            className="text-sm p-1 pl-4 border focus:border-blue-800 border-black rounded"
+          />
+        </form>
+        <div className="w-full flex my-2 justify-end gap-4">
+          <button
+            onClick={() => openCloseFolderModal()}
+            type="submit"
+            className="text-sm font-bold text-gray-500"
+          >
+            Cancelar
+          </button>
+          <button type="button" className="text-sm font-bold text-blue-400">
+            Criar
+          </button>
+        </div>
+      </Modal>
       <div className="pl-4 py-2 rounded m-2 border border-blue-400 flex items-center gap-8">
         {parentId !== null && (
           <Link
@@ -68,6 +114,15 @@ const FolderList: React.FC<{
             <span className="">Voltar</span>
           </Link>
         )}
+        <button
+          onClick={() => openCloseFolderModal()}
+          className="hover:bg-blue-700 transition-all gap-2 p-2 rounded flex item-center bg-blue-400 text-white text-sm"
+        >
+          <div className="p-1 bg-blue-200 rounded">
+            <FaFolderPlus className="" />
+          </div>
+          <span>Criar pasta</span>
+        </button>
         {folders?.map(({ name, id }) => {
           return (
             <Link
@@ -82,21 +137,14 @@ const FolderList: React.FC<{
         })}
       </div>
       <div className="flex gap-4 ml-2 items-center">
-        {search && (
+        {/* {search && (
           <input
             onChange={(e) => setFolderName(e.target.value)}
             value={folderName}
             type="text"
             className="border border-blue-500 rounded p-1 pl-1 outline-none h-fit"
           />
-        )}
-        <button
-          onClick={search ? () => createFolder() : () => openSearch()}
-          className="hover:bg-blue-700 transition-all gap-2 p-2 rounded flex item-center bg-blue-400 text-white"
-        >
-          <FaFolderPlus size={24} className="" />
-          <span>{search ? 'Criar' : 'Adicionar nova pasta'}</span>
-        </button>
+        )} */}
       </div>
       <div className="mt-2">
         <h2 className="text-sm font-semibold text-cyan-900">

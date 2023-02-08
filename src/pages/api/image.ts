@@ -5,7 +5,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import { IImageApiNextApiRequest } from '../../../types/types';
 import { unstable_getServerSession } from 'next-auth/next';
 import { authOptions } from './auth/[...nextauth]';
-import { KeyObject } from 'crypto';
 
 export const config = {
   api: {
@@ -23,7 +22,8 @@ const apiRoute = nextConnect({
 apiRoute.use(upload.single('file'));
 
 apiRoute.post(async (req: IImageApiNextApiRequest, res: NextApiResponse) => {
-  const { title, folderId, keyword } = req.body;
+  const { title, folderId } = req.body;
+  const keyword: { name: string }[] = JSON.parse(req.body.keyword);
   const {
     file: { location: url, mimetype, size, key },
   } = req;
@@ -48,12 +48,18 @@ apiRoute.post(async (req: IImageApiNextApiRequest, res: NextApiResponse) => {
             id: folderId,
           },
         },
+        //[{where: {id: id}, create: {name: name, userId: session.user.id}}],
+
         keyword: {
-          createMany: {
-            data: keyword.map((key) => ({ ...key, userId: session.user.id })),
-          },
+          connectOrCreate: keyword.map((key) => ({
+            where: {
+              keywordToUser: { name: key.name, userId: session.user.id },
+            },
+            create: { name: key.name, userId: session.user.id },
+          })),
         },
       },
+      select: { keyword: { select: { id: true, name: true } } },
     });
   } catch (e) {
     deleteFromAWS(key);

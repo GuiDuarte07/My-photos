@@ -28,7 +28,7 @@ export const upload = multer({
       cb(new Error('tipo inválido', { cause: { error: 'Apenas imagem' } }));
     }
   },
-  limits: { fileSize: 1000000 },
+  /* limits: { fileSize: 1000000 }, */
 });
 
 export function deleteFromAWS(key: string) {

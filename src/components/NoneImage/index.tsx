@@ -1,7 +1,7 @@
 import { CiImageOff } from 'react-icons/ci';
 import Link from 'next/link';
 
-const NoneImage: React.FC = () => {
+const NoneImage: React.FC<{ folderId: string }> = ({ folderId }) => {
   return (
     <div className="w-full h-full flex flex-col items-center justify-center">
       <CiImageOff size={120} />
@@ -12,7 +12,7 @@ const NoneImage: React.FC = () => {
         Gostaria adicionar uma nova foto?
       </h2>
       <Link
-        href="/upload"
+        href={`/upload/${folderId}`}
         className="mt-8 transition-all hover:bg-cyan-800 bg-cyan-600 rounded p-3 flex flex-col items-center justify-around gap-2 text-white text-sm"
       >
         Adicionar imagem

@@ -1,23 +1,19 @@
-import { Session } from 'inspector';
 import { NextPage } from 'next';
-import { unstable_getServerSession } from 'next-auth';
-import { useSession } from 'next-auth/react';
 import Link from 'next/dist/client/link';
 import { GetServerSideProps } from 'next/types';
 import FolderList from '../../../components/Folder';
 import NoneImage from '../../../components/NoneImage';
 import prisma from '../../../lib/prismadb';
 import { isUser } from '../../../utils/isUser';
-import { authOptions } from '../../api/auth/[...nextauth]';
 
 type Images =
   | {
       title: string;
       id: string;
-      createdAt: Date;
+      createdAt: string;
       hidden: boolean;
       url: string;
-      size: bigint;
+      size: number;
     }[]
   | null;
 
@@ -43,7 +39,8 @@ const Home: NextPage<Props> = ({
   keywords,
   allKeywords,
 }) => {
-  console.log(allKeywords);
+  console.log(images);
+
   return (
     <>
       <title>{name}</title>
@@ -57,9 +54,42 @@ const Home: NextPage<Props> = ({
             keywords={keywords}
           />
         )}
-        <div className="w-full h-96">
-          <NoneImage />
-        </div>
+
+        {images ? (
+          <>
+            <div className="mt-16 w-full flex gap-8 flex-wrap">
+              {images.map(({ url, title }, index) => (
+                <div key={title} className="">
+                  {/* <div className="z-10 rounded-full h-8 w-8 bg-red-600 top-[-16px] right-[-16px] absolute flex justify-center items-center">
+                <button >
+                  <BsX size={28} className="text-white" />
+                </button>
+              </div> */}
+
+                  <div className="border-2 border-black p-1 max-w-xs w-full cursor-pointer">
+                    <img
+                      alt={title}
+                      src={url}
+                      //onClick={() => setFullScreenImage(index)}
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="w-full flex justify-center">
+              <Link
+                href={`/upload/${folderId}`}
+                className="mt-16 transition-all hover:bg-cyan-800 bg-cyan-600 rounded py-6 px-40 flex flex-col items-center justify-around gap-2 text-white text-lg"
+              >
+                Adicionar imagem
+              </Link>
+            </div>
+          </>
+        ) : (
+          <div className="w-full h-96">
+            <NoneImage folderId={folderId} />
+          </div>
+        )}
       </div>
     </>
   );
@@ -87,16 +117,17 @@ export const getServerSideProps: GetServerSideProps = async ({
       redirect: { destination: '/404', permanent: true },
     };
 
-  let images: Images | null;
+  let imagesSerialize: Images | null;
   let folders: Folders | null = [];
   let parentId: string | '' = '';
   let name: string;
   let keywords: Keywords;
   let allKeywords: Keywords;
+  let images;
 
   try {
     images = await prisma.image.findMany({
-      where: { folder: { id: folderId }, AND: { userId } },
+      where: { userId, AND: { folderId } },
       select: {
         id: true,
         createdAt: true,
@@ -143,9 +174,15 @@ export const getServerSideProps: GetServerSideProps = async ({
     };
   }
 
+  imagesSerialize = images.map((image) => ({
+    ...image,
+    createdAt: image.createdAt.toString(),
+    size: Number(image.size),
+  }));
+
   return {
     props: {
-      images,
+      images: imagesSerialize,
       folders,
       folderId,
       name,

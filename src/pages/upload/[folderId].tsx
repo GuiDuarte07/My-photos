@@ -1,14 +1,10 @@
 import { NextPage } from 'next';
-import { GetStaticProps } from 'next/types';
-import prisma from '../lib/prismadb';
-import Header from '../components/Header';
+import { GetServerSideProps, GetStaticProps } from 'next/types';
+import prisma from '../../lib/prismadb';
+import Header from '../../components/Header';
 import React, { useEffect, useReducer, useState } from 'react';
 import Image from 'next/image';
-import {
-  actionsUploadEnum,
-  uploadReducer,
-  UploadReducer,
-} from '../hooks/uploadReducer';
+import { actionsUploadEnum, uploadReducer } from '../../hooks/uploadReducer';
 import { TiDelete } from 'react-icons/ti';
 import { RiAddBoxFill } from 'react-icons/ri';
 import { AiFillCloseSquare } from 'react-icons/ai';
@@ -17,8 +13,16 @@ import {
   BsFillArrowLeftCircleFill,
   BsFillArrowRightCircleFill,
 } from 'react-icons/bs';
+import { unstable_getServerSession } from 'next-auth';
+import { authOptions } from '../api/auth/[...nextauth]';
+import axios from 'axios';
 
-const Upload: NextPage = () => {
+type Props = {
+  defaultKeywords: { name: string }[];
+  folderId: string;
+};
+
+const Upload: NextPage<Props> = ({ folderId, defaultKeywords }) => {
   const [imageData, dispatchUpload] = useReducer(uploadReducer, []);
   const [uploadError, setUploadError] = useState(false);
   const [newTextKeyword, setNewTextKeyword] = useState(-1);
@@ -29,11 +33,17 @@ const Upload: NextPage = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const formData = new FormData();
+    Array.from(imageData).forEach((img) => {
+      try {
+        const formData = new FormData();
+        formData.append('file', img.file);
+        formData.append('folderId', folderId);
+        formData.append('title', img.title);
+        formData.append('keyword', JSON.stringify(img.keywords));
 
-    /* Array.from(image).forEach((img) => {
-      formData.append('file', img);
-    }); */
+        axios.post('/api/image', formData);
+      } catch {}
+    });
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,6 +58,7 @@ const Upload: NextPage = () => {
     dispatchUpload({
       type: actionsUploadEnum.UPLOAD,
       files: e.target.files,
+      defaultKeywords,
     });
   };
 
@@ -84,7 +95,7 @@ const Upload: NextPage = () => {
       window.removeEventListener('keydown', keyPressHandle);
       document.body.style.overflow = 'scroll';
     };
-  }, [fullScreenImage]);
+  }, [fullScreenImage, imageData.length]);
 
   return (
     <>
@@ -237,7 +248,7 @@ const Upload: NextPage = () => {
                   {keywords.map((word) => (
                     <div
                       className="bg-gray-300 px-1 gap-2 flex text-center max-w-full"
-                      key={word.id ?? word.name}
+                      key={word.name}
                     >
                       <p className="mr-1 flex-1 text-ellipsis overflow-hidden">
                         {word.name}
@@ -306,17 +317,47 @@ const Upload: NextPage = () => {
   );
 };
 
-/* export const getStaticProps: GetStaticProps = async () => {
-  const folders = await prisma.folder.findMany({
-    where: { parent: { is: null } },
-    select: { id: true, name: true },
+export const getServerSideProps: GetServerSideProps<Props> = async ({
+  req,
+  res,
+  params,
+}) => {
+  let folderId: string;
+
+  const session = await unstable_getServerSession(req, res, authOptions);
+
+  if (typeof params?.folderId === 'string') {
+    folderId = params?.folderId;
+  } else {
+    return {
+      redirect: { destination: '/404', permanent: true },
+    };
+  }
+
+  if (!session?.user)
+    return {
+      redirect: { destination: '/404', permanent: true },
+    };
+
+  const folder = await prisma.folder.findFirst({
+    where: { id: folderId, AND: { userId: session.user.id } },
+    select: {
+      keywords: { select: { name: true } },
+    },
   });
 
-  return {
-    props: {
-      folders,
-    },
-  };
-}; */
+  if (folder) {
+    return {
+      props: {
+        folderId,
+        defaultKeywords: folder.keywords,
+      },
+    };
+  } else {
+    return {
+      redirect: { destination: '/404', permanent: true },
+    };
+  }
+};
 
 export default Upload;

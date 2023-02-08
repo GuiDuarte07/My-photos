@@ -1,4 +1,4 @@
-type Keywords = { name: string; id?: string }[];
+type Keywords = { name: string }[];
 
 export type UploadReducer = {
   file: File;
@@ -19,6 +19,7 @@ type UploadAction = {
   files?: FileList | null;
   text?: string;
   keywordName?: string;
+  defaultKeywords?: Keywords;
 };
 
 export function uploadReducer(
@@ -31,12 +32,12 @@ export function uploadReducer(
     case actionsUploadEnum.UPLOAD:
       if (action.files) {
         Array.from(action.files).forEach((file) => {
-          if (!file.type.includes('image')) return;
+          if (!file.type.includes('image') || !action.defaultKeywords) return;
 
           newState.push({
             file,
             title: file.name,
-            keywords: [{ id: 'e2we', name: 'dasdaj isodjsaoid ajso' }],
+            keywords: action.defaultKeywords,
           });
         });
       }

@@ -45,7 +45,7 @@ export const getServerSideProps: GetServerSideProps = async ({
     };
 
   const folders = await prisma.folder.findMany({
-    where: { parent: { is: null }, AND: { userId: id } },
+    where: { userId: id, AND: { parent_id: null } },
     select: { id: true, name: true },
   });
 

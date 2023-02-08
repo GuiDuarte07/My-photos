@@ -22,7 +22,7 @@ export interface IImageApiNextApiRequest extends NextApiRequest {
   body: {
     title: string;
     folderId: string;
-    keyword: { name: string }[];
+    keyword: string; // parse({ name: string }[])
   };
 }
 
@@ -33,9 +33,15 @@ export interface IFolderApiNextApiRequest extends NextApiRequest {
   };
 }
 
-export interface IKeywordApiNextApiRequest extends NextApiRequest {
+export interface IKeywordFolderApiNextApiRequest extends NextApiRequest {
   body: {
     keyword: string;
     folderId: string;
+  };
+}
+
+export interface IKeywordApiNextApiRequest extends NextApiRequest {
+  body: {
+    keyword: string[];
   };
 }
