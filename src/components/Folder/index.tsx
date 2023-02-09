@@ -21,40 +21,37 @@ import {
   ComboboxOptionText,
 } from '@reach/combobox';
 import '@reach/combobox/styles.css';
-import Modal from 'react-modal';
-
-const customStyles = {
-  content: {
-    top: '50%',
-    left: '50%',
-    right: 'auto',
-    bottom: 'auto',
-    marginRight: '-50%',
-    transform: 'translate(-50%, -50%)',
-  },
-};
+import FolderModal from '../FolderModal';
 
 const FolderList: React.FC<{
   folders: { id: string; name: string }[] | null;
   folderId?: string;
   parentId: string | null;
-  keywords: { id: string; name: string }[] | null;
+  keywords: { name: string }[] | null;
   allKeywords: { id: string; name: string }[] | null;
 }> = ({ folders, folderId, parentId, keywords, allKeywords }) => {
   const [folderName, setFolderName] = useState('');
   const [folderModal, setFolderModal] = useState(false);
   const router = useRouter();
   const { data: sessionData } = useSession();
-  const [newKeyword, setNewKeyword] = useState(false);
-  const [textNewKeyword, setTextNewKeyword] = useState('');
+  const [newKeywords, setNewkeywords] = useState<{ name: string }[]>([]);
 
-  function createFolder() {
-    axios.post('/api/folder', {
-      name: folderName,
-      ...(folderId && { parentId: folderId }),
-    });
-    setFolderModal(false);
-    refreshProps(router);
+  async function createFolder(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    console.log(folderName);
+    console.log(newKeywords);
+    return;
+    if (folderName === '') return;
+    try {
+      await axios.post('/api/folder', {
+        name: folderName,
+        ...(folderId && { parentId: folderId }),
+      });
+      setFolderModal(false);
+      refreshProps(router);
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   function openCloseFolderModal() {
@@ -66,44 +63,35 @@ const FolderList: React.FC<{
     }
   }
 
-  useEffect(() => {
-    if (textNewKeyword === '') setNewKeyword(false);
-  }, [textNewKeyword]);
+  function newKeywordFolder(name: string): boolean {
+    if (name === '') return false;
+    if (newKeywords.find((key) => key.name === name)) return false;
 
-  const addNewKeyword = () => 'd';
+    setNewkeywords([...newKeywords, { name }]);
+    return true;
+  }
+
+  function deleteKeywordFolder(index: number) {
+    setNewkeywords((prev) => {
+      const newKeys = [...prev];
+
+      newKeys.splice(index, 1);
+      return newKeys;
+    });
+  }
 
   return (
     <div>
-      <Modal
-        isOpen={folderModal}
-        onRequestClose={openCloseFolderModal}
-        style={customStyles}
-        contentLabel="Example Modal"
-      >
-        <form>
-          <h1 className="font-semibold text-lg">Criar nova pasta</h1>
-          <label className="block text-sm" htmlFor="folderName">
-            Nome da pasta
-          </label>
-          <input
-            id="folderName"
-            type="text"
-            className="text-sm p-1 pl-4 border focus:border-blue-800 border-black rounded"
-          />
-        </form>
-        <div className="w-full flex my-2 justify-end gap-4">
-          <button
-            onClick={() => openCloseFolderModal()}
-            type="submit"
-            className="text-sm font-bold text-gray-500"
-          >
-            Cancelar
-          </button>
-          <button type="button" className="text-sm font-bold text-blue-400">
-            Criar
-          </button>
-        </div>
-      </Modal>
+      <FolderModal
+        folderName={folderName}
+        keywords={newKeywords}
+        modalToggle={folderModal}
+        setFolderName={setFolderName}
+        openCloseModal={openCloseFolderModal}
+        saveFolder={createFolder}
+        newKeyword={newKeywordFolder}
+        removeKeyword={deleteKeywordFolder}
+      />
       <div className="pl-4 py-2 rounded m-2 border border-blue-400 flex items-center gap-8">
         {parentId !== null && (
           <Link
@@ -153,25 +141,25 @@ const FolderList: React.FC<{
         <ul className="items-center flex gap-2 border border-blue-800 p-2 m-1 min-h-[40px]">
           {keywords?.map((keyword) => (
             <li
-              key={keyword.id}
+              key={keyword.name}
               className="px-2 py-[1px] rounded-sm bg-blue-50"
             >
               {keyword.name}
             </li>
           ))}
-          {!newKeyword ? (
+          {/* {!newKeyword ? (
             <button onClick={() => setNewKeyword(true)}>
               <RiAddBoxFill size={24} className="text-blue-500" />
             </button>
           ) : (
             <div className="">
-              {/* <input
+              {<input
                 autoFocus
                 value={textNewKeyword}
                 onChange={(e) => setTextNewKeyword(e.target.value)}
                 type="search"
                 className="w-52 h-6 p-1 text-sm outline-none border border-blue-200"
-              /> */}
+              />}
               <Combobox aria-labelledby="demo">
                 <ComboboxInput className="w-52 h-6 p-1 text-sm outline-none border border-blue-200" />
                 <ComboboxPopover>
@@ -187,7 +175,7 @@ const FolderList: React.FC<{
                 </ComboboxPopover>
               </Combobox>
             </div>
-          )}
+          )} */}
         </ul>
       </div>
     </div>

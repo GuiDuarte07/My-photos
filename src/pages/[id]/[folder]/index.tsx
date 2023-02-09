@@ -55,11 +55,11 @@ const Home: NextPage<Props> = ({
           />
         )}
 
-        {images ? (
+        {images?.length ? (
           <>
             <div className="mt-16 w-full flex gap-8 flex-wrap">
               {images.map(({ url, title }, index) => (
-                <div key={title} className="">
+                <div key={url} className="">
                   {/* <div className="z-10 rounded-full h-8 w-8 bg-red-600 top-[-16px] right-[-16px] absolute flex justify-center items-center">
                 <button >
                   <BsX size={28} className="text-white" />
