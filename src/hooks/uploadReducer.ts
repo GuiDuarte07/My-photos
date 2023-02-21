@@ -1,3 +1,5 @@
+import path from 'path';
+
 type Keywords = { name: string }[];
 
 export type UploadReducer = {
@@ -34,9 +36,10 @@ export function uploadReducer(
         Array.from(action.files).forEach((file) => {
           if (!file.type.includes('image') || !action.defaultKeywords) return;
 
+          console.log();
           newState.push({
             file,
-            title: file.name,
+            title: path.parse(file.name).name,
             keywords: action.defaultKeywords,
           });
         });

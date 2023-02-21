@@ -38,9 +38,6 @@ const FolderList: React.FC<{
 
   async function createFolder(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    console.log(folderName);
-    console.log(newKeywords);
-    return;
     if (folderName === '') return;
     try {
       await axios.post('/api/folder', {
@@ -92,7 +89,7 @@ const FolderList: React.FC<{
         newKeyword={newKeywordFolder}
         removeKeyword={deleteKeywordFolder}
       />
-      <div className="pl-4 py-2 rounded m-2 border border-blue-400 flex items-center gap-8">
+      <div className="flex-wrap pl-4 py-2 rounded m-2 border border-blue-400 flex items-center gap-8">
         {parentId !== null && (
           <Link
             href={`/${parentId}`}
@@ -111,18 +108,16 @@ const FolderList: React.FC<{
           </div>
           <span>Criar pasta</span>
         </button>
-        {folders?.map(({ name, id }) => {
-          return (
-            <Link
-              className="transition-all hover:bg-cyan-500 bg-cyan-400 rounded px-2 py-1 flex items-center gap-2 text-white text-sm font-mono"
-              key={id}
-              href={`/${sessionData?.user.id}/${id}`}
-            >
-              <AiFillFolderOpen />
-              <span className="">{name}</span>
-            </Link>
-          );
-        })}
+        {folders?.map(({ name, id }) => (
+          <Link
+            className="transition-all hover:bg-cyan-500 bg-cyan-400 rounded px-2 py-1 flex items-center gap-2 text-white text-sm font-mono"
+            key={id}
+            href={`/${sessionData?.user.id}/${id}`}
+          >
+            <AiFillFolderOpen />
+            <span className="">{name}</span>
+          </Link>
+        ))}
       </div>
       <div className="flex gap-4 ml-2 items-center">
         {/* {search && (
@@ -134,7 +129,7 @@ const FolderList: React.FC<{
           />
         )} */}
       </div>
-      <div className="mt-2">
+      <div className="mt-2 flex-wrap w-full">
         <h2 className="text-sm font-semibold text-cyan-900">
           Palavras-chaves desta pasta:
         </h2>
