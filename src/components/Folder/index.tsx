@@ -142,35 +142,6 @@ const FolderList: React.FC<{
               {keyword.name}
             </li>
           ))}
-          {/* {!newKeyword ? (
-            <button onClick={() => setNewKeyword(true)}>
-              <RiAddBoxFill size={24} className="text-blue-500" />
-            </button>
-          ) : (
-            <div className="">
-              {<input
-                autoFocus
-                value={textNewKeyword}
-                onChange={(e) => setTextNewKeyword(e.target.value)}
-                type="search"
-                className="w-52 h-6 p-1 text-sm outline-none border border-blue-200"
-              />}
-              <Combobox aria-labelledby="demo">
-                <ComboboxInput className="w-52 h-6 p-1 text-sm outline-none border border-blue-200" />
-                <ComboboxPopover>
-                  <ComboboxList>
-                    {allKeywords?.map((keywords) => (
-                      <ComboboxOption
-                        className="font-normal text-sm text-cyan-900"
-                        key={keywords.id}
-                        value={keywords.name}
-                      />
-                    ))}
-                  </ComboboxList>
-                </ComboboxPopover>
-              </Combobox>
-            </div>
-          )} */}
         </ul>
       </div>
     </div>

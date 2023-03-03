@@ -35,10 +35,11 @@ type Filter = {
   keywords: string[] | undefined;
 };
 
-const Galery: React.FC<{ images: Images; folderId: string }> = ({
-  images,
-  folderId,
-}) => {
+const Galery: React.FC<{
+  images: Images;
+  folderId: string;
+  openDetail: () => void;
+}> = ({ images, folderId, openDetail }) => {
   const [optionsView, setOptionsView] = useState<boolean>(false);
   const [orderOptionsView, setOrderOptionsView] = useState<boolean>(false);
   const [filterConfig, setFilterConfig] = useState<Filter>({
@@ -69,12 +70,20 @@ const Galery: React.FC<{ images: Images; folderId: string }> = ({
     <>
       <div>
         <nav className="flex items-center justify-between gap-8">
-          <Link
-            href={`/upload/${folderId}`}
-            className="flex items-center m-2 font-bold text-gray-500"
-          >
-            <BsPlus /> Adicionar nova imagem
-          </Link>
+          <div className="flex items-center">
+            <Link
+              href={`/upload/${folderId}`}
+              className="flex items-center m-2 font-bold text-gray-500"
+            >
+              <BsPlus /> Adicionar nova imagem
+            </Link>
+            <button
+              onClick={openDetail}
+              className="font-bold text-sm ml-4 border-b text-slate-500"
+            >
+              Detalhes da pasta
+            </button>
+          </div>
           <div className="relative mr-4 ">
             <button
               onClick={() => setOptionsView((prev) => !prev)}
@@ -146,14 +155,6 @@ const Galery: React.FC<{ images: Images; folderId: string }> = ({
                         </button>
                       </Popup>
                     )}
-                    {/* onClick={() =>
-                setFilterConfig((prev) => ({
-                  ...prev,
-                  ...(prev.order === 'asc'
-                    ? { order: 'desc' }
-                    : { order: 'asc' }),
-                }))
-              } */}
                   </div>
                 </div>
               </Popup>

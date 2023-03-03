@@ -1,4 +1,5 @@
 import { NextPage } from 'next';
+import { useState } from 'react';
 import Link from 'next/dist/client/link';
 import { GetServerSideProps } from 'next/types';
 import FolderList from '../../../components/Folder';
@@ -8,6 +9,7 @@ import { isUser } from '../../../utils/isUser';
 
 import { BsFillGrid3X3GapFill, BsFillGridFill } from 'react-icons/bs';
 import Galery from '../../../components/Galery';
+import Modal from 'react-modal';
 
 type Images =
   | {
@@ -33,6 +35,19 @@ type Props = {
   allKeywords: Keywords;
 };
 
+const customStyles = {
+  content: {
+    top: '50%',
+    left: '50%',
+    right: 'auto',
+    bottom: 'auto',
+    marginRight: '-50%',
+    transform: 'translate(-50%, -50%)',
+    backgroundColor: 'rgb(254, 255, 255)',
+    padding: '0px',
+  },
+};
+
 const Home: NextPage<Props> = ({
   name,
   images,
@@ -42,8 +57,18 @@ const Home: NextPage<Props> = ({
   keywords,
   allKeywords,
 }) => {
+  const [detailsFolderModal, setDetailsFolderModal] = useState<boolean>(false);
+
   return (
     <>
+      <Modal
+        isOpen={detailsFolderModal}
+        onRequestClose={() => setDetailsFolderModal((prev) => !prev)}
+        style={customStyles}
+        contentLabel="Folder Modal"
+      >
+        teste 124
+      </Modal>
       <title>{name}</title>
       <div className="w-full">
         {folders && (
@@ -58,7 +83,11 @@ const Home: NextPage<Props> = ({
 
         {images?.length ? (
           <>
-            <Galery folderId={folderId} images={images} />
+            <Galery
+              openDetail={() => setDetailsFolderModal((prev) => !prev)}
+              folderId={folderId}
+              images={images}
+            />
             <div className="w-full flex justify-center">
               <Link
                 href={`/upload/${folderId}`}
